@@ -1,0 +1,65 @@
+FROM mariadb:10.11
+
+# Definir variáveis de ambiente para configuração do MariaDB e Wordpress
+ENV MARIADB_ROOT_PASSWORD=102030
+ENV MARIADB_DATABASE=wordpress
+ENV MARIADB_USER=wordpress
+ENV MARIADB_PASSWORD=102030
+
+# Expor a porta padrão do MariaDB
+EXPOSE 3306
+
+# Configurar o volume para persistência dos dados
+VOLUME /var/lib/mysql
+
+# Comando para iniciar o MariaDB com as configurações
+# NOTA: Para maior segurança, em um ambiente de produção, considere montar um arquivo de configuração
+# personalizado para o MariaDB ao invés de depender apenas das variáveis de ambiente.
+
+# Para economizar recursos, em um ambiente de produção, você pode considerar configurar limites de recursos
+# para o container no seu arquivo docker-compose.yml, como limites de memória e CPU.
+
+# Dica de segurança adicional:
+# Evite expor a porta 3306 diretamente para o host em ambientes de produção.
+# Utilize o Docker networking para que apenas o container do Wordpress possa acessar o banco de dados.
+
+# Exemplo de uso com Docker Compose (não faz parte do Dockerfile, mas é importante para o contexto):
+#
+# version: '3.8'
+#
+# services:
+#   db:
+#     image: mariadb:10.11
+#     volumes:
+#       - db_data:/var/lib/mysql
+#     ports:
+#       - "3306:3306" # Remova ou comente esta linha em produção para maior segurança
+#     environment:
+#       MYSQL_ROOT_PASSWORD: your_root_password
+#       MYSQL_DATABASE: wordpress
+#       MYSQL_USER: wordpress
+#       MYSQL_PASSWORD: your_wordpress_password
+#     # Opções para economia de recursos (exemplo):
+#     # deploy:
+#     #   resources:
+#     #     limits:
+#     #       cpus: '1'
+#     #       memory: 1GB
+#
+#   wordpress:
+#     depends_on:
+#       - db
+#     image: wordpress:latest
+#     ports:
+#       - "80:80"
+#     environment:
+#       WORDPRESS_DB_HOST: db
+#       WORDPRESS_DB_USER: wordpress
+#       WORDPRESS_DB_PASSWORD: your_wordpress_password
+#       WORDPRESS_DB_NAME: wordpress
+#     volumes:
+#       - wordpress_data:/var/www/html
+#
+# volumes:
+#   db_data:
+#   wordpress_data:

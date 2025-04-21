@@ -1,0 +1,40 @@
+# Usando imagem base Alpine
+FROM alpine:latest
+
+# Instalação de dependências necessárias
+RUN apk add --no-cache apache2
+RUN apk add --no-cache php
+RUN apk add --no-cache php-apache2
+RUN apk add --no-cache php-mysqli  
+RUN apk add --no-cache php-json  
+RUN apk add --no-cache php-zlib  
+RUN apk add --no-cache php-curl  
+RUN apk add --no-cache php-mbstring  
+RUN apk add --no-cache php-xml  
+RUN apk add --no-cache php-session 
+RUN apk add --no-cache wget  
+RUN apk add --no-cache tar
+
+# Baixar e instalar o WordPress 
+WORKDIR /var/www/localhost/htdocs
+RUN wget https://wordpress.org/latest.tar.gz && \
+    tar -xzf latest.tar.gz --strip-components=1 && \
+    rm latest.tar.gz && \
+    rm index.html
+
+# Copiar o arquivo wp-config.php para o diretório do WordPress
+COPY wp-config.php /var/www/localhost/htdocs/wp-config.php
+COPY phpinfo.php .
+COPY .env .
+
+# Configuração de permissões
+RUN chown -R apache:apache /var/www/localhost/htdocs
+
+# Persistência de dados
+VOLUME ["/var/www/localhost/htdocs"]
+
+# Porta padrão do WordPress
+EXPOSE 80
+
+# Comando para iniciar o Apache
+CMD ["httpd", "-D", "FOREGROUND"]

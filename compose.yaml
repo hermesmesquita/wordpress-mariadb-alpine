@@ -1,0 +1,39 @@
+services:
+  wordpress:
+    build:
+      context: .
+      dockerfile: wordpress-alpine-dockerfile
+      
+    container_name: wordpress
+    ports:
+      - "8080:80" # Mapeia a porta 80 do contêiner para a porta 8080 do host
+    volumes:
+      - wordpress_data:/var/www/localhost/htdocs # Persistência de dados do WordPress
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+    depends_on:
+      - mariadb
+
+  mariadb:
+    build:
+      context: .
+      dockerfile: mariadb-alpine-dockerfile
+    container_name: mariadb
+    ports:
+      - "3306:3306" # Porta padrão do MariaDB
+    volumes:
+      - mariadb_data:/var/lib/mysql # Persistência de dados do MariaDB
+      - mariadb_data2:/sys/fs/cgroup/ # Monta o cgroup no contêiner
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+volumes:
+  wordpress_data: 
+  mariadb_data:
+  mariadb_data2:
